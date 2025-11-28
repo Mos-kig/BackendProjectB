@@ -32,17 +32,6 @@ To create the AppWebApi
 
    Verify your can execute endpoint Admin/Environment and Guest/Info
 
-5. Use endpoint Admin/SeedUsers to seed users into the database
-
-6. Use endpoint Guest/LoginUser to login as dbo1
-{
-  "userNameOrEmail": "dbo1",
-  "password": "dbo1"
-}
-
-7. Authorize using Swagger Authorize butto and paste in the encryptedToken recieved after login.
-    NOTE!!: Copy and paste the encryptedToken WITHIN the quotation, i.e. WITHOUT the first and last quotation mark "
-
-8. Use endpoint Admin/Seed to seed the database, Admin/RemoveSeed to remove the seed
+5. Use endpoint Admin/Seed to seed the database, Admin/RemoveSeed to remove the seed
    Verify database seed with endpoint Guest/Info
    As dbo you can now use and play with all endpoints
