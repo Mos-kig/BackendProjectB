@@ -64,8 +64,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
-
 //Add InMemoryLoggerProvider logger
 builder.Services.AddInMemoryLogger();
 
@@ -99,7 +97,7 @@ var app = builder.Build();
 }
 
 app.UseHttpsRedirection();
-app.UseCors(); 
+app.UseCors();
 
 app.UseAuthorization();
 app.MapControllers();

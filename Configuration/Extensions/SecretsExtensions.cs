@@ -12,7 +12,7 @@ public static class SecretsExtensions
     //to use either user secrets or azure key vault depending on UseAzureKeyVault tag in appsettings.json
     //Azure key vault access parameters location are set in <AzureProjectSettings> tag in the csproj file
     //User secret id is set in <UserSecretsId>
-    public static IConfigurationBuilder AddSecrets(this IConfigurationBuilder config, IHostEnvironment environment, string appsettingsFolder=null)
+    public static IConfigurationBuilder AddSecrets(this IConfigurationBuilder config, IHostEnvironment environment, string appsettingsFolder = null)
     {
         // current directory is either the application or the dbContext when running migrations
         appsettingsFolder ??= Directory.GetCurrentDirectory();
@@ -44,7 +44,7 @@ public static class SecretsExtensions
 
             // Build a temporary configuration to read from appsettings.json and user secrets
             tempConfig = config.Build();
-        
+
             // Read the UserSecretsId programmatically in order to display it during migration runs
             var userSecretsIdAttribute = assembly.GetCustomAttributes(typeof(UserSecretsIdAttribute), false)
                 .FirstOrDefault() as UserSecretsIdAttribute;

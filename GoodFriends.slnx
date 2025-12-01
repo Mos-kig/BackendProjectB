@@ -4,6 +4,8 @@
   <Project Path="DbModels\DbModels.csproj" />
   <Project Path="DbRepos\DbRepos.csproj" />
   <Project Path="Services\Services.csproj" />
+  <Project Path="AppMVC/AppMVC.csproj" />
+  <Project Path="AppRazor/AppRazor.csproj" />
   <Project Path="AppWebApi\AppWebApi.csproj" />
   <Project Path="Models\Models.csproj" />
   <Project Path="Encryptions\Encryptions.csproj" />
