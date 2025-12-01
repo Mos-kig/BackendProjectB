@@ -22,6 +22,46 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             }
+        },
+        {
+            "name": "AppMVC",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/AppMVC/bin/Debug/net9.0/AppMVC.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/AppMVC",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/AppMVC/Views"
+            }
+        },
+        {
+            "name": "AppRazor",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/AppRazor/bin/Debug/net9.0/AppRazor.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/AppRazor",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Pages": "${workspaceFolder}/AppRazor/Pages"
+            }
         }
     ]
 }
