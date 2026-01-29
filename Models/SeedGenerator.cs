@@ -329,7 +329,7 @@ namespace Seido.Utilities.SeedGenerator
             return retList;
         }
         #endregion
- 
+
         #region initialize master content
         SeedJsonContent CreateMasterSeedFile()
         {
@@ -666,7 +666,7 @@ namespace Seido.Utilities.SeedGenerator
         {
             #region Country towards json file
             string _jsonCountry;
-            public string jsonCountry { get => _jsonCountry; set { _jsonCountry = value; }}
+            public string jsonCountry { get => _jsonCountry; set { _jsonCountry = value; } }
             #endregion
 
             [JsonIgnore]
@@ -881,19 +881,20 @@ namespace Seido.Utilities.SeedGenerator
                 return Path.Combine(documentPath, name);
             }
 
-            public static bool FileExists(string FileName){
+            public static bool FileExists(string FileName)
+            {
 
                 var fn = Path.GetFileName(FileName);
                 if (fn == FileName)
                 {
                     //no path in FileName use default directory
-                   return File.Exists(fname(FileName));
+                    return File.Exists(fname(FileName));
                 }
-    
+
                 return File.Exists(FileName);
             }
         }
-    #endregion
+        #endregion
     }
 }
 
