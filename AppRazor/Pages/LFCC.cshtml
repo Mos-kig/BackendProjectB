@@ -1,0 +1,23 @@
+﻿@page
+@model AppRazor.Pages.LFCCModel
+@{
+    ViewData["Title"] = "LFCC";
+}
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@attribute [IgnoreAntiforgeryToken]
+
+
+<div class="container px-4 py-4" id="LFCC">
+    <p>
+        List of all Friends in a Country and/or City
+    </p>
+
+
+</div>
+
+@section Scripts
+{
+    <!-- -->
+    <partial name="_ValidationScriptsPartial" />
+}
