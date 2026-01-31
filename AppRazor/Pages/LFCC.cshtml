@@ -9,12 +9,53 @@
 
 
 <div class="container px-4 py-4" id="LFCC">
-    <p>
-        List of all Friends in a Country and/or City
-    </p>
+    <h2 class="pb-2 border-bottom"> List of all Friends in a Country and/or City</h2>
+    <div class="row mb-1 text-center">
+        <div class="col-md-8 ">
+            <form class="d-flex mt-3 mt-lg-0" role="search" method="post">
+                <input asp-for="SearchFilter" class="form-control me-2" type="search"
+                    placeholder="Search by name, country, or city" aria-label="Search">
+                <button asp-page-handler="Search" class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    @foreach (var item in Model.friends)
+    {
+        <div class="row mb-2 text-center">
+            <div class="col-md-10 themed-grid-col">
+                @item.FirstName @item.LastName
+            </div>
+            @* <div class="col-md-2 themed-grid-col">
+                <a href="~/LFCC?id=@item.FriendId" class="btn btn-success btn-sm" type="button">View</a>
+                <a href="~/Studies/Model/ModelView?id=@item.FriendId" class="btn btn-success btn-sm" type="button">View</a>
+            </div> *@
+        </div>
+    }
+    <nav aria-label="Standard pagination example">
+        <ul class="pagination">
+            <li class="page-item">
+                <a class="page-link" href="~/LFCC?pagenr=@Model.PrevPageNr&search=@Model.SearchFilter"
+                    aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            @for (int i = 0; i < Model.PresentPages; i++)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="~/LFCC?pagenr=@i&search=@Model.SearchFilter">@(i + 1)</a>
+                </li>
 
-
+            }
+            <li class="page-item">
+                <a class="page-link" href="~/LFCC?pagenr=@Model.NextPageNr&search=@Model.SearchFilter"
+                    aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>
+
 
 @section Scripts
 {

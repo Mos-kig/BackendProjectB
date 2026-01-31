@@ -44,7 +44,7 @@ public class FriendsDbRepos
 
             item = await query.FirstOrDefaultAsync<IFriend>();
         }
-        
+
         if (item == null) throw new ArgumentException($"Item {id} is not existing");
         return new ResponseItemDto<IFriend>()
         {
@@ -78,19 +78,22 @@ public class FriendsDbRepos
 #endif
             DbItemsCount = await query
 
-            //Adding filter functionality
+            //filter functionality
             .Where(i => (i.Seeded == seeded) &&
                         (i.FirstName.ToLower().Contains(filter) ||
-                            i.LastName.ToLower().Contains(filter))).CountAsync(),
+                            i.LastName.ToLower().Contains(filter) ||
+                            (i.AddressDbM != null && i.AddressDbM.Country.ToLower().Contains(filter)) ||
+                            (i.AddressDbM != null && i.AddressDbM.City.ToLower().Contains(filter)))).CountAsync(),
 
             PageItems = await query
 
-            //Adding filter functionality
+            //filter functionality
             .Where(i => (i.Seeded == seeded) &&
                         (i.FirstName.ToLower().Contains(filter) ||
-                            i.LastName.ToLower().Contains(filter)))
+                            i.LastName.ToLower().Contains(filter) ||
+                            (i.AddressDbM != null && i.AddressDbM.Country.ToLower().Contains(filter)) ||
+                            (i.AddressDbM != null && i.AddressDbM.City.ToLower().Contains(filter))))
 
-            //Adding paging
             .Skip(pageNumber * pageSize)
             .Take(pageSize)
 

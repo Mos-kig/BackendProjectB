@@ -1,25 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Models.Interfaces;
-using Services;
+using Models;
 using Services.Interfaces;
 
 namespace AppRazor.Pages
 {
     public class FriCouModel : PageModel
     {
-        public readonly IAdminService _adminService;
-        public IEnumerable<IGrouping<string, Models.DTO.GstUsrInfoFriendsDto>>? CountryInfo;
+        public readonly IFriendsService _friendsService;
+        public IEnumerable<IGrouping<string, csFriend>>? CountryInfo;
 
         public async Task<IActionResult> OnGet()
         {
-            var info = await _adminService.GuestInfoAsync();
-            CountryInfo = info.Item.Friends.GroupBy(f => f.Country);
+            var response = await _friendsService.ReadFriendsAsync(true, false, "", 0, int.MaxValue);
+            var allFriends = response.PageItems.Cast<csFriend>().ToList();
+
+            CountryInfo = allFriends.GroupBy(f => f.Address?.Country ?? "Unknown Country")
+                .OrderBy(g => g.Key == "Unknown Country" ? "zzz" : g.Key);
             return Page();
         }
-        public FriCouModel(IAdminService adminService)
+
+        public FriCouModel(IFriendsService friendsService)
         {
-            _adminService = adminService;
+            _friendsService = friendsService;
         }
     }
 }
