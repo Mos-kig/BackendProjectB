@@ -32,9 +32,6 @@ namespace AppRazor.Pages
             try
             {
                 Guid _id = Guid.Parse(id);
-                //Read a QueryParameter
-                //Guid _id = Guid.Parse(Request.Query["id"]);
-
                 //Use the Service
                 var response = await _friendsService.ReadFriendAsync(_id, false);
                 friends = new List<csFriend> { (csFriend)response.Item };

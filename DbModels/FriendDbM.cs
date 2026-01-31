@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 using Seido.Utilities.SeedGenerator;
 using Models;
-using Models.Interfaces;    
+using Models.Interfaces;
 using Models.DTO;
 
 namespace DbModels;
@@ -15,9 +15,9 @@ namespace DbModels;
 [Index(nameof(LastName), nameof(FirstName))]
 sealed public class FriendDbM : csFriend, ISeed<FriendDbM>
 {
-    [Key]    
+    [Key]
     public override Guid FriendId { get; set; }
-    
+
     [Required]
     public override string FirstName { get; set; }
 
@@ -36,7 +36,7 @@ sealed public class FriendDbM : csFriend, ISeed<FriendDbM>
     [JsonIgnore]
     public List<PetDbM> PetsDbM { get; set; } = null;
 
-    [NotMapped] 
+    [NotMapped]
     public override List<IQuote> Quotes { get => QuotesDbM?.ToList<IQuote>(); set => new NotImplementedException(); }
     [JsonIgnore]
     public List<QuoteDbM> QuotesDbM { get; set; } = null;
@@ -56,6 +56,7 @@ sealed public class FriendDbM : csFriend, ISeed<FriendDbM>
         FirstName = org.FirstName;
         LastName = org.LastName;
         Birthday = org.Birthday;
+        Email = org.Email;
 
         return this;
     }
