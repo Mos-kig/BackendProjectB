@@ -10,6 +10,8 @@
 
 <div class="container px-4 py-4" id="LFCC">
     <h2 class="pb-2 border-bottom"> List of all Friends in a Country and/or City</h2>
+    <p>Click "View" to view the details of a Friend, including Address, Pets and Quotes</p>
+
     <div class="row mb-1 text-center">
         <div class="col-md-8 ">
             <form class="d-flex mt-3 mt-lg-0" role="search" method="post">
@@ -25,10 +27,9 @@
             <div class="col-md-10 themed-grid-col">
                 @item.FirstName @item.LastName
             </div>
-            @* <div class="col-md-2 themed-grid-col">
-                <a href="~/LFCC?id=@item.FriendId" class="btn btn-success btn-sm" type="button">View</a>
-                <a href="~/Studies/Model/ModelView?id=@item.FriendId" class="btn btn-success btn-sm" type="button">View</a>
-            </div> *@
+            <div class="col-md-2 themed-grid-col">
+                <a href="~/VDFAPQ?id=@item.FriendId" class="btn btn-success btn-sm" type="button">View</a>
+            </div>
         </div>
     }
     <nav aria-label="Standard pagination example">
