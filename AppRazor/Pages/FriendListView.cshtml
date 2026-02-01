@@ -1,14 +1,14 @@
 ﻿@page
-@model AppRazor.Pages.LFCCModel
+@model AppRazor.Pages.FriendListModel
 @{
-    ViewData["Title"] = "LFCC";
+    ViewData["Title"] = "FriendListView";
 }
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @attribute [IgnoreAntiforgeryToken]
 
 
-<div class="container px-4 py-4" id="LFCC">
+<div class="container px-4 py-4" id="FriendListView">
     <h2 class="pb-2 border-bottom"> List of all Friends in a Country and/or City</h2>
     <p>Click "View" to view the details of a Friend, including Address, Pets and Quotes</p>
 
@@ -35,7 +35,7 @@
     <nav aria-label="Standard pagination example">
         <ul class="pagination">
             <li class="page-item">
-                <a class="page-link" href="~/LFCC?pagenr=@Model.PrevPageNr&search=@Model.SearchFilter"
+                <a class="page-link" href="~/FriendListView?pagenr=@Model.PrevPageNr&search=@Model.SearchFilter"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
@@ -43,12 +43,12 @@
             @for (int i = 0; i < Model.PresentPages; i++)
             {
                 <li class="page-item">
-                    <a class="page-link" href="~/LFCC?pagenr=@i&search=@Model.SearchFilter">@(i + 1)</a>
+                    <a class="page-link" href="~/FriendListView?pagenr=@i&search=@Model.SearchFilter">@(i + 1)</a>
                 </li>
 
             }
             <li class="page-item">
-                <a class="page-link" href="~/LFCC?pagenr=@Model.NextPageNr&search=@Model.SearchFilter"
+                <a class="page-link" href="~/FriendListView?pagenr=@Model.NextPageNr&search=@Model.SearchFilter"
                     aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>

@@ -5,10 +5,10 @@ using Services.Interfaces;
 
 namespace AppRazor.Pages
 {
-    public class LFCCModel : PageModel
+    public class FriendListModel : PageModel
     {
         public readonly IFriendsService _friendsService;
-        readonly ILogger<LFCCModel> _logger = null;
+        readonly ILogger<FriendListModel> _logger = null;
 
         public List<csFriend> friends { get; set; } = new List<csFriend>();
 
@@ -80,7 +80,7 @@ namespace AppRazor.Pages
             //Page is rendered as the postback is part of the form tag
             return Page();
         }
-        public LFCCModel(IFriendsService friendsService, ILogger<LFCCModel> logger)
+        public FriendListModel(IFriendsService friendsService, ILogger<FriendListModel> logger)
         {
             _friendsService = friendsService;
             _logger = logger;
