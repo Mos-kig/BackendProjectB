@@ -268,53 +268,6 @@ namespace AppRazor.Pages
             }
             return Page();
         }
-        public async Task<IActionResult> OnPostSave()
-        {
-            try
-            {
-                if (friendIM == null || friendIM.Count == 0)
-                {
-                    ErrorMessage = "No friend data to save.";
-                    return Page();
-                }
-
-                foreach (var friendItem in friendIM)
-                {
-                    if (friendItem.StatusIM == StatusIM.Deleted)
-                    {
-                        await _service.DeleteFriendAsync(friendItem.FriendId);
-                        ErrorMessage = "Friend deleted successfully.";
-                        Friend = null;
-                        friendIM.Clear();
-                    }
-                    else if (friendItem.StatusIM == StatusIM.Modified)
-                    {
-                        // Update the friend in the database
-                        var response = await _service.ReadFriendAsync(friendItem.FriendId, false);
-                        var model = response.Item as csFriend;
-
-                        if (model != null)
-                        {
-                            // Update the changes and save 
-                            model = friendItem.UpdateModel(model);
-                            var updateDto = new FriendCuDto(model);
-                            await _service.UpdateFriendAsync(updateDto);
-
-                            // Update the display data
-                            Friend = model;
-                            friendItem.StatusIM = StatusIM.Unchanged;
-                        }
-                    }
-                }
-
-                ErrorMessage = null; // Clear any previous errors
-            }
-            catch (Exception e)
-            {
-                ErrorMessage = $"Error saving changes: {e.Message}";
-            }
-            return Page();
-        }
         public VDFAPQModel(IFriendsService service, ILogger<VDFAPQModel> logger)
         {
             _logger = logger;
