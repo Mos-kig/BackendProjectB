@@ -125,37 +125,90 @@
                         <div class="form-floating col-md-12 themed-grid-col">
                             <button type="submit" asp-page-handler="Edit" asp-route-friendId="@Model.friendIM[k].FriendId"
                                 class="btn btn-success btn-sm m-1">
-                                💾 Save.
+                                💾 Save Details.
                             </button>
                         </div>
                     </div>
                 }
             </div>
         </div>
-        <!-- Address Details -->
-        @if (Model.Friend?.Address != null)
+
+        @if (Model.AddressIMs.Any())
         {
             <h4>Address</h4>
-            <div class="row g-3 mb-4">
-                <div class="col-sm-6">
-                    <label for="streetAddress" class="form-label">Street Address</label>
-                    <input type="text" class="form-control" id="streetAddress" value="@Model.Friend.Address.StreetAddress"
-                        readonly>
+            @for (int i = 0; i < Model.AddressIMs.Count; i++)
+            {
+                <div class="row mb-2 text-center">
+                    <!-- Hidden fields for Address -->
+                    <input asp-for="AddressIMs[i].StatusIM" value="@Model.AddressIMs[i].StatusIM" class="form-control"
+                        type="hidden" />
+                    <input asp-for="AddressIMs[i].AddressId" value="@Model.AddressIMs[i].AddressId" class="form-control"
+                        type="hidden" />
+                    <input asp-for="AddressIMs[i].StreetAddress" value="@Model.AddressIMs[i].StreetAddress" class="form-control"
+                        type="hidden" />
+                    <input asp-for="AddressIMs[i].ZipCode" value="@Model.AddressIMs[i].ZipCode" class="form-control"
+                        type="hidden" />
+                    <input asp-for="AddressIMs[i].City" value="@Model.AddressIMs[i].City" class="form-control" type="hidden" />
+                    <input asp-for="AddressIMs[i].Country" value="@Model.AddressIMs[i].Country" class="form-control"
+                        type="hidden" />
+
+                    <div class="col-md-10 themed-grid-col">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <strong>Address:</strong> @Model.AddressIMs[i].StreetAddress, @Model.AddressIMs[i].ZipCode
+                                @Model.AddressIMs[i].City, @Model.AddressIMs[i].Country
+                            </div>
+                            <div class="col-12">
+                                <strong>AddressID:</strong> @Model.AddressIMs[i].AddressId
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 themed-grid-col">
+                        <button class="btn btn-secondary btn-sm m-1" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseEditAddress_@Model.AddressIMs[i].AddressId">
+                            Edit
+                        </button>
+                        <button class="btn btn-outline-secondary" type="submit" asp-page-handler="Undo">
+                            ↶ Undo
+                        </button>
+                    </div>
                 </div>
-                <div class="col-sm-3">
-                    <label for="zipCode" class="form-label">Zip Code</label>
-                    <input type="text" class="form-control" id="zipCode" value="@Model.Friend.Address.ZipCode" readonly>
+
+                <!-- Edit Address Collapsible Form -->
+                <div class="collapse row mb-2 text-center" id="collapseEditAddress_@Model.AddressIMs[i].AddressId">
+                    <div class="form-floating col-md-6 themed-grid-col">
+                        <input asp-for="AddressIMs[i].EditStreetAddress" class="form-control"
+                            value="@Model.AddressIMs[i].EditStreetAddress" />
+                        <span asp-validation-for="AddressIMs[i].EditStreetAddress" class="invalid-feedback"></span>
+                        <label asp-for="AddressIMs[i].EditStreetAddress">Street Address</label>
+                    </div>
+                    <div class="form-floating col-md-6 themed-grid-col">
+                        <input asp-for="AddressIMs[i].EditZipCode" class="form-control"
+                            value="@Model.AddressIMs[i].EditZipCode" />
+                        <span asp-validation-for="AddressIMs[i].EditZipCode" class="invalid-feedback"></span>
+                        <label asp-for="AddressIMs[i].EditZipCode">Zip Code</label>
+                    </div>
+                    <div class="form-floating col-md-6 themed-grid-col">
+                        <input asp-for="AddressIMs[i].EditCity" class="form-control" value="@Model.AddressIMs[i].EditCity" />
+                        <span asp-validation-for="AddressIMs[i].EditCity" class="invalid-feedback"></span>
+                        <label asp-for="AddressIMs[i].EditCity">City</label>
+                    </div>
+                    <div class="form-floating col-md-6 themed-grid-col">
+                        <input asp-for="AddressIMs[i].EditCountry" class="form-control"
+                            value="@Model.AddressIMs[i].EditCountry" />
+                        <span asp-validation-for="AddressIMs[i].EditCountry" class="invalid-feedback"></span>
+                        <label asp-for="AddressIMs[i].EditCountry">Country</label>
+                    </div>
+                    <div class="form-floating col-md-12 themed-grid-col">
+                        <button type="submit" asp-page-handler="EditAddress" asp-route-friendId="@Model.friendIM[0].FriendId"
+                            class="btn btn-success btn-sm m-1">
+                            💾 Save Address
+                        </button>
+                    </div>
                 </div>
-                <div class="col-sm-3">
-                    <label for="city" class="form-label">City</label>
-                    <input type="text" class="form-control" id="city" value="@Model.Friend.Address.City" readonly>
-                </div>
-                <div class="col-sm-6">
-                    <label for="country" class="form-label">Country</label>
-                    <input type="text" class="form-control" id="country" value="@Model.Friend.Address.Country" readonly>
-                </div>
-            </div>
+            }
         }
+
         <!-- Pets Details -->
         @if (Model.Friend?.Pets != null && Model.Friend.Pets.Any())
         {

@@ -34,7 +34,7 @@ public class FriendCuDto
         Email = org.Email;
         Birthday = org.Birthday;
 
-        AddressId = org?.Address?.AddressId;
+        this.AddressId = org?.Address?.AddressId;
         PetsId = org.Pets?.Select(i => i.PetId).ToList();
         QuotesId = org.Quotes?.Select(i => i.QuoteId).ToList();
     }
@@ -58,7 +58,7 @@ public class FriendCuDto
             // Use DateTime.Parse to validate the date by converting back to string and parsing
             var dateString = Birthday.Value.ToString("yyyy-MM-dd");
             var parsedDate = DateTime.Parse(dateString);
-                
+
             // Additional checks for reasonable birthday range
             if (parsedDate != Birthday.Value || parsedDate.Year < 1900 || parsedDate > DateTime.Now)
             {

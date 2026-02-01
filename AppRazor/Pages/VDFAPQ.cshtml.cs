@@ -10,6 +10,7 @@ namespace AppRazor.Pages
     public class VDFAPQModel : PageModel
     {
         readonly IFriendsService _service;
+        readonly IAddressesService _addressService;
         readonly ILogger<VDFAPQModel> _logger;
         public csFriend Friend { get; set; }
         public string ErrorMessage { get; set; } = null;
@@ -17,6 +18,8 @@ namespace AppRazor.Pages
         [BindProperty]
         public List<FriendIM> friendIM { get; set; } = new List<FriendIM>();
 
+        [BindProperty]
+        public List<AddressIM> AddressIMs { get; set; } = new List<AddressIM>();
         public ModelValidationResult ValidationResult { get; set; } = new ModelValidationResult(false, null, null);
 
         public async Task<IActionResult> OnGet(string id)
@@ -27,6 +30,11 @@ namespace AppRazor.Pages
                 var response = await _service.ReadFriendAsync(_id, false);
                 Friend = response.Item as csFriend;
                 friendIM = Friend != null ? new List<FriendIM> { new FriendIM(Friend) } : new List<FriendIM>();
+
+                if (Friend?.Address != null)
+                {
+                    AddressIMs = new List<AddressIM> { new AddressIM(Friend.Address) };
+                }
             }
             catch (Exception e)
             {
@@ -63,6 +71,7 @@ namespace AppRazor.Pages
                 // Clear the current friend data to show it's been deleted
                 Friend = null;
                 friendIM = new List<FriendIM>();
+                AddressIMs = new List<AddressIM>();
 
                 ErrorMessage = "Friend deleted successfully.";
             }
@@ -76,6 +85,7 @@ namespace AppRazor.Pages
                     var response = await _service.ReadFriendAsync(friendId, false);
                     Friend = response.Item as csFriend;
                     friendIM = Friend != null ? new List<FriendIM> { new FriendIM(Friend) } : new List<FriendIM>();
+                    AddressIMs = Friend?.Address != null ? new List<AddressIM> { new AddressIM(Friend.Address) } : new List<AddressIM>();
                 }
                 catch (Exception reloadEx)
                 {
@@ -154,6 +164,10 @@ namespace AppRazor.Pages
                 var verifiedFriend = verifyResponse.Item as csFriend;
                 Friend = verifiedFriend; // Update the Friend property
                 friendIM = verifiedFriend != null ? new List<FriendIM> { new FriendIM(verifiedFriend) } : new List<FriendIM>();
+                if (Friend?.Address != null)
+                {
+                    AddressIMs = new List<AddressIM> { new AddressIM(Friend.Address) };
+                }
             }
             catch (Exception e)
             {
@@ -174,6 +188,76 @@ namespace AppRazor.Pages
                     ErrorMessage += $" Error reloading friend data: {reloadEx.Message}";
                 }
                 return Page();
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostEditAddress(Guid friendId)
+        {
+            // Use form friend ID if the parameter is empty
+            Guid actualFriendId = friendId;
+            if (friendId == Guid.Empty && friendIM.Any())
+            {
+                actualFriendId = friendIM[0].FriendId;
+            }
+            // Ensure we have a valid friendId
+            if (actualFriendId == Guid.Empty)
+            {
+                ErrorMessage = "Invalid friend ID for address update.";
+                return Page();
+            }
+
+            // Server-side validation for the address fields
+            string[] keys = {
+                "AddressIMs[0].EditStreetAddress",
+                "AddressIMs[0].EditZipCode",
+                "AddressIMs[0].EditCity",
+                "AddressIMs[0].EditCountry"
+            };
+
+            if (!ModelState.IsValidPartially(out ModelValidationResult validationResult, keys))
+            {
+                ValidationResult = validationResult;
+                var friendResponse = await _service.ReadFriendAsync(actualFriendId, false);
+                Friend = friendResponse.Item as csFriend;
+                friendIM = Friend != null ? new List<FriendIM> { new FriendIM(Friend) } : new List<FriendIM>();
+                return Page();
+            }
+
+            try
+            {
+                var submittedAddress = AddressIMs[0];
+                // Create a DTO for the address update
+                var addressDto = new AddressCuDto
+                {
+                    AddressId = submittedAddress.AddressId, // Get the ID from the hidden form field
+                    StreetAddress = submittedAddress.EditStreetAddress,
+                    ZipCode = submittedAddress.EditZipCode,
+                    City = submittedAddress.EditCity,
+                    Country = submittedAddress.EditCountry,
+                    FriendsId = new List<Guid> { actualFriendId }
+                };
+                await _addressService.UpdateAddressAsync(addressDto);
+
+                var verifyResponse = await _service.ReadFriendAsync(actualFriendId, false);
+                Friend = verifyResponse.Item as csFriend;
+                friendIM = Friend != null ? new List<FriendIM> { new FriendIM(Friend) } : new List<FriendIM>();
+                if (Friend?.Address != null)
+                {
+                    AddressIMs = new List<AddressIM> { new AddressIM(Friend.Address) };
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorMessage = $"Error saving address: {e.Message}";
+                var friendResponse = await _service.ReadFriendAsync(actualFriendId, false);
+                Friend = friendResponse.Item as csFriend;
+                friendIM = Friend != null ? new List<FriendIM> { new FriendIM(Friend) } : new List<FriendIM>();
+                if (Friend?.Address != null)
+                {
+                    AddressIMs = new List<AddressIM> { new AddressIM(Friend.Address) };
+                }
             }
 
             return Page();
@@ -230,10 +314,11 @@ namespace AppRazor.Pages
             }
             return Page();
         }
-        public VDFAPQModel(IFriendsService service, ILogger<VDFAPQModel> logger)
+        public VDFAPQModel(IFriendsService service, ILogger<VDFAPQModel> logger, IAddressesService addressService)
         {
             _logger = logger;
             _service = service;
+            _addressService = addressService;
         }
 
         public enum StatusIM { Unknown, Unchanged, Inserted, Modified, Deleted }
@@ -313,6 +398,79 @@ namespace AppRazor.Pages
             }
             #endregion
 
+        }
+
+        public class AddressIM
+        {
+            //Status of InputModel
+            public StatusIM StatusIM { get; set; }
+
+            //Properties from Model which is to be edited in the <form>
+            public Guid AddressId { get; set; }
+            public string StreetAddress { get; set; }
+            public int ZipCode { get; set; }
+            public string City { get; set; }
+            public string Country { get; set; }
+
+            //Edit properties for in-place editing
+            [Required(ErrorMessage = "Street Address is required")]
+            public string EditStreetAddress { get; set; }
+
+            [Required(ErrorMessage = "Zip Code is required")]
+            public int EditZipCode { get; set; }
+
+            [Required(ErrorMessage = "City is required")]
+            public string EditCity { get; set; }
+
+            [Required(ErrorMessage = "Country is required")]
+            public string EditCountry { get; set; }
+            public AddressIM() { StatusIM = StatusIM.Unchanged; }
+
+
+            //Copy constructor
+            public AddressIM(AddressIM original)
+            {
+                StatusIM = original.StatusIM;
+
+                AddressId = original.AddressId;
+                StreetAddress = original.StreetAddress;
+                ZipCode = original.ZipCode;
+                City = original.City;
+                Country = original.Country;
+
+                EditStreetAddress = original.EditStreetAddress;
+                EditZipCode = original.EditZipCode;
+                EditCity = original.EditCity;
+                EditCountry = original.EditCountry;
+            }
+
+            //Model => InputModel constructor
+            public AddressIM(Models.Interfaces.IAddress original)
+            {
+                if (original == null)
+                {
+                    StatusIM = StatusIM.Unknown;
+                    return;
+                }
+
+                StatusIM = StatusIM.Unchanged;
+                AddressId = original.AddressId;
+                StreetAddress = EditStreetAddress = original.StreetAddress;
+                ZipCode = EditZipCode = original.ZipCode;
+                City = EditCity = original.City;
+                Country = EditCountry = original.Country;
+            }
+
+            //InputModel => Model
+            public Address UpdateModel(Address model)
+            {
+                model.AddressId = AddressId;
+                model.StreetAddress = StreetAddress;
+                model.ZipCode = ZipCode;
+                model.City = City;
+                model.Country = Country;
+                return model;
+            }
         }
     }
 }
