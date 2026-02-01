@@ -3,13 +3,11 @@
 @{
     ViewData["Title"] = "VDFAPQ";
 }
-
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @attribute [IgnoreAntiforgeryToken]
 
-
 <div class="container px-4 py-4" id="VDFAPQ">
-    <form class="needs-validation" method="post" novalidate>
+    <form class="needs-validation @(Model.ValidationResult.HasErrors ? "was-validated" : "")" method="post" novalidate>
         <p>
             1.View the details of a Friend, including Address, Pets and Quotes.<br>
             2.Edit the details of a Friend with frontend and server-side validation.<br>
@@ -32,7 +30,6 @@
                 }
             </div>
         }
-
         @if (Model.ErrorMessage != null)
         {
             <div class="row mb-1 text-center">
@@ -41,168 +38,167 @@
                 </span>
             </div>
         }
-        else
+
+        <div class="row row-cols-1 row-cols-lg-4 align-items-stretch g-4 py-5">
+            <div class="col-md-7 col-lg-10">
+
+                <!-- Friend Details -->
+                <h4>Friend Details</h4>
+
+                @for (int k = 0; k < Model.friendIM.Count; k++)
+                {
+                    <div
+                        class="row mb-2 text-center @(Model.friendIM[k].StatusIM == AppRazor.Pages.VDFAPQModel.StatusIM.Deleted ? "d-none" : null)">
+
+                        <!-- Hidden fields so they are preserved by the Modelbinder -->
+                        <input asp-for="friendIM[k].StatusIM" value="@Model.friendIM[k].StatusIM" class="form-control"
+                            type="hidden" />
+                        <input asp-for="friendIM[k].FriendId" value="@Model.friendIM[k].FriendId" class="form-control"
+                            type="hidden" />
+                        <input asp-for="friendIM[k].FirstName" value="@Model.friendIM[k].FirstName" class="form-control"
+                            type="hidden" />
+                        <input asp-for="friendIM[k].LastName" value="@Model.friendIM[k].LastName" class="form-control"
+                            type="hidden" />
+                        <input asp-for="friendIM[k].Email" value="@Model.friendIM[k].Email" class="form-control"
+                            type="hidden" />
+                        <input asp-for="friendIM[k].Birthday" value="@Model.friendIM[k].Birthday" class="form-control"
+                            type="hidden" />
+                        <div class="col-md-10 themed-grid-col">
+                            <div class="row g-2">
+                                <div class="col-6"><strong>Name:</strong> @Model.friendIM[k].FirstName
+                                    @Model.friendIM[k].LastName</div>
+                                <div class="col-6"><strong>Email:</strong> @Model.friendIM[k].Email</div>
+                                <div class="col-6"><strong>ID:</strong> @Model.friendIM[k].FriendId</div>
+                                @if (Model.friendIM[k].Birthday != null)
+                                {
+                                    <div class="col-6"><strong>Birthday:</strong>
+                                        @Model.friendIM[k].Birthday?.ToString("yyyy-MM-dd")</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-2 themed-grid-col">
+                            <button class="btn btn-secondary btn-sm m-1" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseEdit_@Model.friendIM[k].FriendId">
+                                Edit
+                            </button>
+
+                            <!-- Button trigger post Delete -->
+                            <button type="submit" asp-page-handler="Delete" asp-route-friendId="@Model.friendIM[k].FriendId"
+                                class="btn btn-danger btn-sm m-1">
+                                Del
+                            </button>
+                            <button class="btn btn-outline-secondary" type="submit" asp-page-handler="Undo">
+                                ↶ Undo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="collapse row mb-2 text-center" id="collapseEdit_@Model.friendIM[k].FriendId">
+                        <div class="form-floating col-md-6 themed-grid-col">
+                            <!--Fields to edit -->
+                            <input asp-for="friendIM[k].EditFirstName" class="form-control"
+                                value="@Model.friendIM[k].EditFirstName" />
+                            <span asp-validation-for="friendIM[k].EditFirstName" class="invalid-feedback"></span>
+                            <label asp-for="friendIM[k].EditFirstName">FirstName</label>
+                        </div>
+                        <div class="form-floating col-md-6 themed-grid-col">
+                            <!--Fields to edit -->
+                            <input asp-for="friendIM[k].EditLastName" class="form-control"
+                                value="@Model.friendIM[k].EditLastName" />
+                            <span asp-validation-for="friendIM[k].EditLastName" class="invalid-feedback"></span>
+                            <label asp-for="friendIM[k].EditLastName">LastName</label>
+                        </div>
+                        <div class="form-floating col-md-6 themed-grid-col">
+                            <!--Edit Email -->
+                            <input asp-for="friendIM[k].EditEmail" class="form-control" type="email"
+                                value="@Model.friendIM[k].EditEmail" />
+                            <span asp-validation-for="friendIM[k].EditEmail" class="invalid-feedback"></span>
+                            <label asp-for="friendIM[k].EditEmail">Email</label>
+                        </div>
+                        <div class="form-floating col-md-6 themed-grid-col">
+                            <!--Edit Birthday -->
+                            <input asp-for="friendIM[k].EditBirthday" class="form-control" type="date"
+                                value="@(Model.friendIM[k].EditBirthday?.ToString("yyyy-MM-dd") ?? "")" />
+                            <span asp-validation-for="friendIM[k].EditBirthday" class="invalid-feedback"></span>
+                            <label asp-for="friendIM[k].EditBirthday">Birthday</label>
+                        </div>
+                        <div class="form-floating col-md-12 themed-grid-col">
+                            <button type="submit" asp-page-handler="Edit" asp-route-friendId="@Model.friendIM[k].FriendId"
+                                class="btn btn-success btn-sm m-1">
+                                💾 Save.
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <!-- Address Details -->
+        @if (Model.Friend?.Address != null)
         {
-            <div class="row row-cols-1 row-cols-lg-4 align-items-stretch g-4 py-5">
-                <div class="col-md-7 col-lg-10">
-
-                    <!-- Friend Details -->
-                    <h4>Friend Details</h4>
-
-                    @for (int k = 0; k < Model.friendIM.Count; k++)
-                    {
-                        <div
-                            class="row mb-2 text-center @(Model.friendIM[k].StatusIM == AppRazor.Pages.VDFAPQModel.StatusIM.Deleted ? "d-none" : null)">
-
-                            <!-- Hidden fields so they are preserved by the Modelbinder -->
-                            <input asp-for="friendIM[k].StatusIM" value="@Model.friendIM[k].StatusIM" class="form-control"
-                                type="hidden" />
-                            <input asp-for="friendIM[k].FriendId" value="@Model.friendIM[k].FriendId" class="form-control"
-                                type="hidden" />
-                            <input asp-for="friendIM[k].FirstName" value="@Model.friendIM[k].FirstName" class="form-control"
-                                type="hidden" />
-                            <input asp-for="friendIM[k].LastName" value="@Model.friendIM[k].LastName" class="form-control"
-                                type="hidden" />
-                            <input asp-for="friendIM[k].Email" value="@Model.friendIM[k].Email" class="form-control"
-                                type="hidden" />
-                            <input asp-for="friendIM[k].Birthday" value="@Model.friendIM[k].Birthday" class="form-control"
-                                type="hidden" />
-                            <div class="col-md-10 themed-grid-col">
-                                <div class="row g-2">
-                                    <div class="col-6"><strong>Name:</strong> @Model.friendIM[k].FirstName
-                                        @Model.friendIM[k].LastName</div>
-                                    <div class="col-6"><strong>Email:</strong> @Model.friendIM[k].Email</div>
-                                    <div class="col-6"><strong>ID:</strong> @Model.friendIM[k].FriendId</div>
-                                    @if (Model.friendIM[k].Birthday != null)
-                                    {
-                                        <div class="col-6"><strong>Birthday:</strong>
-                                            @Model.friendIM[k].Birthday?.ToString("yyyy-MM-dd")</div>
-                                    }
-                                </div>
-                            </div>
-                            <div class="col-md-2 themed-grid-col">
-                                <button class="btn btn-secondary btn-sm m-1" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseEdit_@Model.friendIM[k].FriendId">
-                                    Edit
-                                </button>
-
-                                <!-- Button trigger post Delete -->
-                                <button type="submit" asp-page-handler="Delete" asp-route-friendId="@Model.friendIM[k].FriendId"
-                                    class="btn btn-danger btn-sm m-1">
-                                    Del
-                                </button>
-                                <button class="btn btn-outline-secondary" type="submit" asp-page-handler="Undo">
-                                    ↶ Undo
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="collapse row mb-2 text-center" id="collapseEdit_@Model.friendIM[k].FriendId">
-                            <div class="form-floating col-md-6 themed-grid-col">
-                                <!--Fields to edit -->
-                                <input asp-for="friendIM[k].EditFirstName" class="form-control"
-                                    value="@Model.friendIM[k].EditFirstName" />
-                                <span asp-validation-for="friendIM[k].EditFirstName" class="invalid-feedback"></span>
-                                <label asp-for="friendIM[k].EditFirstName">FirstName</label>
-                            </div>
-                            <div class="form-floating col-md-6 themed-grid-col">
-                                <!--Fields to edit -->
-                                <input asp-for="friendIM[k].EditLastName" class="form-control"
-                                    value="@Model.friendIM[k].EditLastName" />
-                                <span asp-validation-for="friendIM[k].EditLastName" class="invalid-feedback"></span>
-                                <label asp-for="friendIM[k].EditLastName">LastName</label>
-                            </div>
-                            <div class="form-floating col-md-6 themed-grid-col">
-                                <!--Edit Email -->
-                                <input asp-for="friendIM[k].EditEmail" class="form-control" type="email"
-                                    value="@Model.friendIM[k].EditEmail" />
-                                <span asp-validation-for="friendIM[k].EditEmail" class="invalid-feedback"></span>
-                                <label asp-for="friendIM[k].EditEmail">Email</label>
-                            </div>
-                            <div class="form-floating col-md-6 themed-grid-col">
-                                <!--Edit Birthday -->
-                                <input asp-for="friendIM[k].EditBirthday" class="form-control" type="date"
-                                    value="@(Model.friendIM[k].EditBirthday?.ToString("yyyy-MM-dd") ?? "")" />
-                                <span asp-validation-for="friendIM[k].EditBirthday" class="invalid-feedback"></span>
-                                <label asp-for="friendIM[k].EditBirthday">Birthday</label>
-                            </div>
-                            <div class="form-floating col-md-12 themed-grid-col">
-                                <button type="submit" asp-page-handler="Edit" asp-route-friendId="@Model.friendIM[k].FriendId"
-                                    class="btn btn-success btn-sm m-1">
-                                    💾 Save.
-                                </button>
-                            </div>
-                        </div>
-                    }
+            <h4>Address</h4>
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6">
+                    <label for="streetAddress" class="form-label">Street Address</label>
+                    <input type="text" class="form-control" id="streetAddress" value="@Model.Friend.Address.StreetAddress"
+                        readonly>
+                </div>
+                <div class="col-sm-3">
+                    <label for="zipCode" class="form-label">Zip Code</label>
+                    <input type="text" class="form-control" id="zipCode" value="@Model.Friend.Address.ZipCode" readonly>
+                </div>
+                <div class="col-sm-3">
+                    <label for="city" class="form-label">City</label>
+                    <input type="text" class="form-control" id="city" value="@Model.Friend.Address.City" readonly>
+                </div>
+                <div class="col-sm-6">
+                    <label for="country" class="form-label">Country</label>
+                    <input type="text" class="form-control" id="country" value="@Model.Friend.Address.Country" readonly>
                 </div>
             </div>
-            <!-- Address Details -->
-            @if (Model.Friend?.Address != null)
-            {
-                <h4>Address</h4>
-                <div class="row g-3 mb-4">
-                    <div class="col-sm-6">
-                        <label for="streetAddress" class="form-label">Street Address</label>
-                        <input type="text" class="form-control" id="streetAddress" value="@Model.Friend.Address.StreetAddress"
-                            readonly>
-                    </div>
-                    <div class="col-sm-3">
-                        <label for="zipCode" class="form-label">Zip Code</label>
-                        <input type="text" class="form-control" id="zipCode" value="@Model.Friend.Address.ZipCode" readonly>
-                    </div>
-                    <div class="col-sm-3">
-                        <label for="city" class="form-label">City</label>
-                        <input type="text" class="form-control" id="city" value="@Model.Friend.Address.City" readonly>
-                    </div>
-                    <div class="col-sm-6">
-                        <label for="country" class="form-label">Country</label>
-                        <input type="text" class="form-control" id="country" value="@Model.Friend.Address.Country" readonly>
-                    </div>
-                </div>
-            }
-            <!-- Pets Details -->
-            @if (Model.Friend?.Pets != null && Model.Friend.Pets.Any())
-            {
-                <h4>Pets</h4>
-                <div class="row g-3 mb-4">
-                    @foreach (var pet in Model.Friend.Pets)
-                    {
-                        <div class="col-sm-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">@pet.Name</h6>
-                                    <p class="card-text">
-                                        <strong>Kind:</strong> @pet.Kind<br>
-                                        <strong>Mood:</strong> @pet.Mood
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-
-            <!-- Quotes Details -->
-            @if (Model.Friend?.Quotes != null && Model.Friend.Quotes.Any())
-            {
-                <h4>Favorite Quotes</h4>
-                <div class="row g-3 mb-4">
-                    @foreach (var quote in Model.Friend.Quotes)
-                    {
-                        <div class="col-sm-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <blockquote class="blockquote mb-0">
-                                        <p>"@quote.QuoteText"</p>
-                                        <footer class="blockquote-footer">@quote.Author</footer>
-                                    </blockquote>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
         }
+        <!-- Pets Details -->
+        @if (Model.Friend?.Pets != null && Model.Friend.Pets.Any())
+        {
+            <h4>Pets</h4>
+            <div class="row g-3 mb-4">
+                @foreach (var pet in Model.Friend.Pets)
+                {
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">@pet.Name</h6>
+                                <p class="card-text">
+                                    <strong>Kind:</strong> @pet.Kind<br>
+                                    <strong>Mood:</strong> @pet.Mood
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Quotes Details -->
+        @if (Model.Friend?.Quotes != null && Model.Friend.Quotes.Any())
+        {
+            <h4>Favorite Quotes</h4>
+            <div class="row g-3 mb-4">
+                @foreach (var quote in Model.Friend.Quotes)
+                {
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <blockquote class="blockquote mb-0">
+                                    <p>"@quote.QuoteText"</p>
+                                    <footer class="blockquote-footer">@quote.Author</footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
 
     </form>
 </div>

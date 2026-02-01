@@ -12,7 +12,6 @@ namespace AppRazor.Pages
         readonly IFriendsService _service;
         readonly ILogger<VDFAPQModel> _logger;
         public csFriend Friend { get; set; }
-
         public string ErrorMessage { get; set; } = null;
 
         [BindProperty]
@@ -89,23 +88,12 @@ namespace AppRazor.Pages
 
         public async Task<IActionResult> OnPostEdit(Guid friendId)
         {
-            // Get values directly from form
-            string editFirstName = Request.Form["friendIM[0].EditFirstName"];
-            string editLastName = Request.Form["friendIM[0].EditLastName"];
-            string editEmail = Request.Form["friendIM[0].EditEmail"];
-            string editBirthday = Request.Form["friendIM[0].EditBirthday"];
-            string formFriendId = Request.Form["friendIM[0].FriendId"];
-
             // Use form friend ID if the parameter is empty
             Guid actualFriendId = friendId;
-            if (friendId == Guid.Empty && !string.IsNullOrEmpty(formFriendId))
+            if (friendId == Guid.Empty && friendIM.Any())
             {
-                if (Guid.TryParse(formFriendId, out Guid parsedId))
-                {
-                    actualFriendId = parsedId;
-                }
+                actualFriendId = friendIM[0].FriendId;
             }
-
             // Validate we have a valid friend ID
             if (actualFriendId == Guid.Empty)
             {
@@ -114,52 +102,26 @@ namespace AppRazor.Pages
             }
 
             // Validate the input
-            if (string.IsNullOrWhiteSpace(editFirstName))
+            string[] keys = {
+                "friendIM[0].EditFirstName",
+                "friendIM[0].EditLastName",
+                "friendIM[0].EditEmail"
+            };
+
+            // Perform partial model validation
+            if (!ModelState.IsValidPartially(out ModelValidationResult validationResult, keys))
             {
-                ErrorMessage = "First name is required.";
-                // Reload the page data
-                try
-                {
-                    var reloadResponse = await _service.ReadFriendAsync(actualFriendId, false);
-                    Friend = reloadResponse.Item as csFriend;
-                    friendIM = new List<FriendIM> { new FriendIM(Friend) };
-                }
-                catch { }
+                ValidationResult = validationResult;
                 return Page();
             }
 
-            if (string.IsNullOrWhiteSpace(editLastName))
-            {
-                ErrorMessage = "Last name is required.";
-                // Reload the page data
-                try
-                {
-                    var reloadResponse = await _service.ReadFriendAsync(actualFriendId, false);
-                    Friend = reloadResponse.Item as csFriend;
-                    friendIM = new List<FriendIM> { new FriendIM(Friend) };
-                }
-                catch { }
-                return Page();
-            }
-
-            // Email validation
-            if (editEmail != null && string.IsNullOrWhiteSpace(editEmail))
-            {
-                ErrorMessage = "Email cannot be just whitespace.";
-                // Reload the page data
-                try
-                {
-                    var reloadResponse = await _service.ReadFriendAsync(actualFriendId, false);
-                    Friend = reloadResponse.Item as csFriend;
-                    friendIM = new List<FriendIM> { new FriendIM(Friend) };
-                }
-                catch { }
-                return Page();
-            }
+            // Get the submitted values from the model-bound property
+            var submittedFriend = friendIM[0];
 
             // Save to database immediately
             try
             {
+
                 var response = await _service.ReadFriendAsync(actualFriendId, false);
                 var model = response.Item as csFriend;
 
@@ -169,17 +131,17 @@ namespace AppRazor.Pages
                     return Page();
                 }
 
-                // Update with the new values
-                model.FirstName = editFirstName;
-                model.LastName = editLastName;
-                model.Email = editEmail;
+                // Update with the new values from the bound model
+                model.FirstName = submittedFriend.EditFirstName;
+                model.LastName = submittedFriend.EditLastName;
+                model.Email = submittedFriend.EditEmail;
 
                 // Parse birthday if provided
-                if (!string.IsNullOrEmpty(editBirthday) && DateTime.TryParse(editBirthday, out DateTime parsedBirthday))
+                if (submittedFriend.EditBirthday.HasValue)
                 {
-                    model.Birthday = parsedBirthday;
+                    model.Birthday = submittedFriend.EditBirthday;
                 }
-                else if (string.IsNullOrEmpty(editBirthday))
+                else
                 {
                     model.Birthday = null;
                 }
@@ -283,31 +245,22 @@ namespace AppRazor.Pages
 
             //Properties from Model which is to be edited in the <form>
             public Guid FriendId { get; init; } = Guid.NewGuid();
-
-            [Required(ErrorMessage = "You type provide a FirstName")]
             public string FirstName { get; set; }
-
-            [Required(ErrorMessage = "You must provide a LastName")]
             public string LastName { get; set; }
-
-            //Added properites to edit in the list with undo
-            [Required(ErrorMessage = "You must provide an Email")]
             public string Email { get; set; }
-
-            [Required(ErrorMessage = "You must provide a Birthday")]
             public DateTime? Birthday { get; set; }
 
+
             //Edit properties for in-place editing
-            [Required(ErrorMessage = "You must provide a firstname")]
+            [Required(ErrorMessage = "You must provide a FirstName")]
             public string EditFirstName { get; set; }
 
-            [Required(ErrorMessage = "You must provide a lastname")]
+            [Required(ErrorMessage = "You must provide a LastName")]
             public string EditLastName { get; set; }
 
             [Required(ErrorMessage = "You must provide an email")]
+            [RegularExpression(@"\S+", ErrorMessage = "Email cannot be empty or just whitespace")]
             public string EditEmail { get; set; }
-
-            [Required(ErrorMessage = "You must provide a birthday")]
 
             public DateTime? EditBirthday { get; set; }
 
@@ -322,7 +275,6 @@ namespace AppRazor.Pages
                 FriendId = original.FriendId;
                 FirstName = original.FirstName;
                 LastName = original.LastName;
-
                 Email = original.Email;
                 Birthday = original.Birthday;
 
@@ -343,16 +295,10 @@ namespace AppRazor.Pages
 
                 StatusIM = StatusIM.Unchanged;
                 FriendId = original.FriendId;
-                FirstName = original.FirstName;
-                LastName = original.LastName;
-                Email = original.Email;
-                Birthday = original.Birthday;
-
-                // Initialize edit fields with current values
-                EditFirstName = original.FirstName;
-                EditLastName = original.LastName;
-                EditEmail = original.Email;
-                EditBirthday = original.Birthday;
+                FirstName = EditFirstName = original.FirstName;
+                LastName = EditLastName = original.LastName;
+                Email = EditEmail = original.Email;
+                Birthday = EditBirthday = original.Birthday;
             }
 
             //InputModel => Model
