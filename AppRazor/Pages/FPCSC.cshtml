@@ -10,6 +10,20 @@
 
 <div class="container px-4 py-4" id="FPCSC">
     <h2 class="pb-2 border-bottom">Overview Friends and Pets in the cities of a specific country.</h2>
+    <div class="row mb-1 text-center">
+        <div class="col-md-8 ">
+            <form class="d-flex mt-3 mt-lg-0" role="search" method="get">
+                <input asp-for="SearchFilter" class="form-control me-2" type="search"
+                    placeholder="Search country or city" aria-label="Search">
+                <button asp-page-handler="Search" class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            @* <form class="d-flex mt-3 mt-lg-0" role="search" method="post">
+                <input asp-for="SearchFilter" class="form-control me-2" type="search"
+                    placeholder="Search country or city" aria-label="Search">
+                <button asp-page-handler="Search" class="btn btn-outline-success" type="submit">Search</button>
+            </form> *@
+        </div>
+    </div>
     @foreach (var cityGroup in Model.CityInfo)
     {
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 py-5">

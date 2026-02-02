@@ -45,7 +45,7 @@ public class PetsDbRepos
 
             item = await query.FirstOrDefaultAsync<IPet>();
         }
-        
+
         if (item == null) throw new ArgumentException($"Item {id} is not existing");
         return new ResponseItemDto<IPet>()
         {
@@ -81,18 +81,22 @@ public class PetsDbRepos
             DbItemsCount = await query
 
             //Adding filter functionality
-            .Where(i => (i.Seeded == seeded) && 
+            .Where(i => (i.Seeded == seeded) &&
                         (i.Name.ToLower().Contains(filter) ||
                             i.strMood.ToLower().Contains(filter) ||
-                            i.strKind.ToLower().Contains(filter))).CountAsync(),
+                            i.strKind.ToLower().Contains(filter) ||
+                            (i.FriendDbM.AddressDbM != null && i.FriendDbM.AddressDbM.Country.ToLower().Contains(filter)) ||
+                            (i.FriendDbM.AddressDbM != null && i.FriendDbM.AddressDbM.City.ToLower().Contains(filter)))).CountAsync(),
 
             PageItems = await query
 
             //Adding filter functionality
-            .Where(i => (i.Seeded == seeded) && 
+            .Where(i => (i.Seeded == seeded) &&
                         (i.Name.ToLower().Contains(filter) ||
                             i.strMood.ToLower().Contains(filter) ||
-                            i.strKind.ToLower().Contains(filter)))
+                            i.strKind.ToLower().Contains(filter) ||
+                            (i.FriendDbM.AddressDbM != null && i.FriendDbM.AddressDbM.Country.ToLower().Contains(filter)) ||
+                            (i.FriendDbM.AddressDbM != null && i.FriendDbM.AddressDbM.City.ToLower().Contains(filter))))
 
             //Adding paging
             .Skip(pageNumber * pageSize)
@@ -155,7 +159,7 @@ public class PetsDbRepos
         await _dbContext.SaveChangesAsync();
 
         //return the updated item in non-flat mode
-        return await ReadPetAsync(item.PetId, false);    
+        return await ReadPetAsync(item.PetId, false);
     }
 
     public async Task<ResponseItemDto<IPet>> CreatePetAsync(PetCuDto itemDto)
@@ -177,7 +181,7 @@ public class PetsDbRepos
         await _dbContext.SaveChangesAsync();
 
         //return the updated item in non-flat mode
-        return await ReadPetAsync(item.PetId, false);    
+        return await ReadPetAsync(item.PetId, false);
     }
 
     private async Task navProp_PetCUdto_to_PetDbM(PetCuDto itemDtoSrc, PetDbM itemDst)
