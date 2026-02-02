@@ -19,7 +19,8 @@
                 </svg>
                 <div>
                     <h3 class="fw-bold mb-0 fs-4 text-body-emphasis">@(cityGroup.Key)</h3>
-                    <p>@cityGroup.Count() friends</p>
+                    <p>@cityGroup.Count() Friends</p>
+                    <p>@(Model.PetInfo?.FirstOrDefault(g => g.Key == cityGroup.Key)?.Count() ?? 0) Pets</p>
                 </div>
             </div>
         </div>
