@@ -11,6 +11,7 @@ namespace AppRazor.Pages
     {
         readonly IFriendsService _service;
         readonly IAddressesService _addressService;
+        readonly IPetsService _petsService;
         readonly ILogger<VDFAPQModel> _logger;
         public csFriend Friend { get; set; }
         public string ErrorMessage { get; set; } = null;
@@ -21,7 +22,13 @@ namespace AppRazor.Pages
         [BindProperty]
         public List<AddressIM> AddressIMs { get; set; } = new List<AddressIM>();
         public ModelValidationResult ValidationResult { get; set; } = new ModelValidationResult(false, null, null);
-
+        public VDFAPQModel(IFriendsService service, ILogger<VDFAPQModel> logger, IAddressesService addressService, IPetsService petsService)
+        {
+            _logger = logger;
+            _service = service;
+            _addressService = addressService;
+            _petsService = petsService;
+        }
         public async Task<IActionResult> OnGet(string id)
         {
             try
@@ -96,15 +103,58 @@ namespace AppRazor.Pages
             return Page();
         }
 
+        public async Task<IActionResult> OnPostDeletePet(Guid itemId, Guid currentFriendId)
+        {
+            if (itemId == Guid.Empty)
+            {
+                string formItemId = Request.Form["itemId"];
+                if (!string.IsNullOrEmpty(formItemId) && Guid.TryParse(formItemId, out Guid parsedId))
+                {
+                    itemId = parsedId;
+                }
+            }
+
+            if (currentFriendId == Guid.Empty)
+            {
+                string formFriendId = Request.Form["currentFriendId"];
+                if (!string.IsNullOrEmpty(formFriendId) && Guid.TryParse(formFriendId, out Guid parsedId))
+                {
+                    currentFriendId = parsedId;
+                }
+            }
+
+            if (itemId == Guid.Empty || currentFriendId == Guid.Empty)
+            {
+                ErrorMessage = "Could not delete pet. Required ID was missing.";
+                if (currentFriendId != Guid.Empty)
+                {
+                    return await OnGet(currentFriendId.ToString());
+                }
+                return Page();
+            }
+
+            try
+            {
+                await _petsService.DeletePetAsync(itemId);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error deleting pet with ID {PetId}", itemId);
+                ErrorMessage = $"Error deleting pet: {e.Message}";
+                await OnGet(currentFriendId.ToString());
+                return Page();
+            }
+
+            return RedirectToPage(new { id = currentFriendId });
+        }
         public async Task<IActionResult> OnPostEdit(Guid friendId)
         {
-            // Use form friend ID if the parameter is empty
             Guid actualFriendId = friendId;
             if (friendId == Guid.Empty && friendIM.Any())
             {
                 actualFriendId = friendIM[0].FriendId;
             }
-            // Validate we have a valid friend ID
+
             if (actualFriendId == Guid.Empty)
             {
                 ErrorMessage = "Invalid friend ID.";
@@ -313,12 +363,6 @@ namespace AppRazor.Pages
                 ErrorMessage = $"Error reloading data: {e.Message}";
             }
             return Page();
-        }
-        public VDFAPQModel(IFriendsService service, ILogger<VDFAPQModel> logger, IAddressesService addressService)
-        {
-            _logger = logger;
-            _service = service;
-            _addressService = addressService;
         }
 
         public enum StatusIM { Unknown, Unchanged, Inserted, Modified, Deleted }
