@@ -3,8 +3,24 @@
 @{
     ViewData["Title"] = "Home page";
 }
-
 <div class="text-center">
-    <h1 class="display-4">Welcome...</h1>
-    <p class="display-5">to Moses Kigundu's AppRazor.</p>
+    <h1 class="display-4">Welcome to Moses Kigundu's AppRazor.</h1>
+    <div style="text-align: left; display: inline-block;">
+        <p>This is a simple Razor Pages application that demonstrates the following features:</p>
+        <ol style="list-style-position: outside; padding-left: 20px;">
+            <li>Overview Friends by country = FriCou</li>
+            <li>Overview Friends and Pets in the cities of a specific country = FPCSC</li>
+            <li>
+                FriendListView:
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>List of all Friends in a Country and/or City.</li>
+                    <li>View the details of a Friend, including Address, Pets and Quotes.</li>
+                    <li>Edit the details of a Friend with frontend and server-side validation.</li>
+                    <li>Edit the details of a Friends Address with frontend and server-side validation.</li>
+                    <li>Delete a Pet and a Quote from a Friend with modal confirmation.</li>
+                </ul>
+            </li>
+            <li>Seed.</li>
+        </ol>
+    </div>
 </div>
