@@ -12,6 +12,7 @@ namespace AppRazor.Pages
         readonly IFriendsService _service;
         readonly IAddressesService _addressService;
         readonly IPetsService _petsService;
+        readonly IQuotesService _quotesService;
         readonly ILogger<VDFAPQModel> _logger;
         public csFriend Friend { get; set; }
         public string ErrorMessage { get; set; } = null;
@@ -22,12 +23,13 @@ namespace AppRazor.Pages
         [BindProperty]
         public List<AddressIM> AddressIMs { get; set; } = new List<AddressIM>();
         public ModelValidationResult ValidationResult { get; set; } = new ModelValidationResult(false, null, null);
-        public VDFAPQModel(IFriendsService service, ILogger<VDFAPQModel> logger, IAddressesService addressService, IPetsService petsService)
+        public VDFAPQModel(IFriendsService service, ILogger<VDFAPQModel> logger, IAddressesService addressService, IPetsService petsService, IQuotesService quotesService)
         {
             _logger = logger;
             _service = service;
             _addressService = addressService;
             _petsService = petsService;
+            _quotesService = quotesService;
         }
         public async Task<IActionResult> OnGet(string id)
         {
@@ -147,6 +149,53 @@ namespace AppRazor.Pages
 
             return RedirectToPage(new { id = currentFriendId });
         }
+
+        public async Task<IActionResult> OnPostDeleteQuote(Guid itemId, Guid currentFriendId)
+        {
+            if (itemId == Guid.Empty)
+            {
+                string formItemId = Request.Form["itemId"];
+                if (!string.IsNullOrEmpty(formItemId) && Guid.TryParse(formItemId, out Guid parsedId))
+                {
+                    itemId = parsedId;
+                }
+            }
+
+            if (currentFriendId == Guid.Empty)
+            {
+                string formFriendId = Request.Form["currentFriendId"];
+                if (!string.IsNullOrEmpty(formFriendId) && Guid.TryParse(formFriendId, out Guid parsedId))
+                {
+                    currentFriendId = parsedId;
+                }
+            }
+
+            if (itemId == Guid.Empty || currentFriendId == Guid.Empty)
+            {
+                ErrorMessage = "Could not delete quote. Required ID was missing.";
+                if (currentFriendId != Guid.Empty)
+                {
+                    return await OnGet(currentFriendId.ToString());
+                }
+                return Page();
+            }
+
+            try
+            {
+                await _quotesService.DeleteQuoteAsync(itemId);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error deleting quote with ID {QuoteId}", itemId);
+                ErrorMessage = $"Error deleting quote: {e.Message}";
+                await OnGet(currentFriendId.ToString());
+                return Page();
+            }
+
+            return RedirectToPage(new { id = currentFriendId });
+        }
+
+
         public async Task<IActionResult> OnPostEdit(Guid friendId)
         {
             Guid actualFriendId = friendId;
