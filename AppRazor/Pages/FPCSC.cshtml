@@ -9,11 +9,21 @@
 
 
 <div class="container px-4 py-4" id="FPCSC">
-    <p>
-        Overview Friends and Pets in the cities of a specific country
-    </p>
-
-
+    <h2 class="pb-2 border-bottom">Overview Friends and Pets in the cities of a specific country.</h2>
+    @foreach (var cityGroup in Model.CityInfo)
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 py-5">
+            <div class="col d-flex align-items-start">
+                <svg class="bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em">
+                    <use xlink:href="#Sweden" />
+                </svg>
+                <div>
+                    <h3 class="fw-bold mb-0 fs-4 text-body-emphasis">@(cityGroup.Key)</h3>
+                    <p>@cityGroup.Count() friends</p>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 @section Scripts
