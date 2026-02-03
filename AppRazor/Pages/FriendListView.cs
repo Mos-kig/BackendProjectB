@@ -55,7 +55,7 @@ namespace AppRazor.Pages
             //Pagination
             await UpdatePaginationAsync();
 
-            //Use the Service
+            //Use our Service
             var response = await _friendsService.ReadFriendsAsync(true, false, SearchFilter, ThisPageNr, PageSize);
             friends = response.PageItems.Cast<csFriend>().ToList();
             return Page();
